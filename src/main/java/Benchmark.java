@@ -128,7 +128,6 @@ public class Benchmark {
                     System.out.println("Roaring bitmap on " + dataSet
                             + " dataset");
                     System.out.println("***************************");
-                    System.out.println("Serialization time: "+serialisationTime+" ms");
                     System.out.println("Deserialization time: "+deserializationTime+" ms");
                     System.out.println("RAM Size = " + (sizeRAM*1. / 1024)
                             + " Kb" + " ("
@@ -216,7 +215,6 @@ public class Benchmark {
                     System.out.println("***************************");
                     System.out.println("ConciseSet on " + dataSet + " dataset");
                     System.out.println("***************************");
-                    System.out.println("Serialization time: "+serialisationTime+" ms");
                     System.out.println("Deserialization time: "+deserializationTime+" ms");
                     System.out.println("RAM Size = " + (sizeRAM * 1. / 1024)
                             + " Kb" + " ("
