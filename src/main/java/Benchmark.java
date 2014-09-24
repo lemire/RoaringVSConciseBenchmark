@@ -51,8 +51,9 @@ public class Benchmark {
         }
 
         try {
-            String dataSources[] = { "census1881.csv", "census-income.csv",
-                    "weather_sept_85.csv" };
+            String dataSources[] = { "census1881.csv", "census1881.csv", "census-income.csv",
+             "census-income.csv",
+       "weather_sept_85.csv", "weather_sept_85.csv" };
 
             RealDataRetriever dataRetriever = new RealDataRetriever(args.length == 0 ? "real-roaring-datasets" : args[0]);
             int[][] datum = new int[NumberOfBitmaps][];
@@ -77,6 +78,7 @@ public class Benchmark {
                         rb.serialize(dos);
                         dos.flush();
                     }
+                    offsets.add(fos.getChannel().position());
                     long aft = System.currentTimeMillis();
                     long serialisationTime = aft - bef;
                     long lastOffset = fos.getChannel().position();
@@ -87,23 +89,30 @@ public class Benchmark {
                             FileChannel.MapMode.READ_ONLY, 0, lastOffset);
                     // RAM space used in bytes
                     long sizeRAM = 0;
-                    bef = System.currentTimeMillis();
                     irbs = new ImmutableRoaringBitmap[NumberOfBitmaps];
-                    int i_rb = 0;
                     for (int k = 0; k < offsets.size() - 1; k++) {
                         mbb.position((int) offsets.get(k).longValue());
                         final ByteBuffer bb = mbb.slice();
                         bb.limit((int) (offsets.get(k + 1) - offsets.get(k)));
                         ImmutableRoaringBitmap irb = new ImmutableRoaringBitmap(
                                 bb);
-                        irbs[i_rb] = irb;
-                        i_rb++;
+                        irbs[k] = irb;
                         if (sizeOf)
                             sizeRAM += (SizeOf.deepSizeOf(irb));
                     }
+                    // we redo the work, but just for the timing
+                    bef = System.currentTimeMillis();
+                    for (int k = 0; k < offsets.size() - 1; k++) {
+                        mbb.position((int) offsets.get(k).longValue());
+                        final ByteBuffer bb = mbb.slice();
+                        bb.limit((int) (offsets.get(k + 1) - offsets.get(k)));
+                        ImmutableRoaringBitmap irb = new ImmutableRoaringBitmap(
+                                bb);
+                        irbs[k] = irb;
+                    }
                     aft = System.currentTimeMillis();
                     long deserializationTime = aft - bef;
-                    irbs = Arrays.copyOfRange(irbs, 0, i_rb);
+                    //irbs = Arrays.copyOfRange(irbs, 0, offsets.size() - 1);
                     // Disk space used in bytes
                     long sizeDisk = file.length();
                     // Horizontal unions between NumberOfBitmaps Roaring bitmaps
@@ -165,26 +174,33 @@ public class Benchmark {
                             dos.writeInt(ints[k]);
                         dos.flush();
                     }
+                    offsets.add(fos.getChannel().position());
                     long aft = System.currentTimeMillis();
                     long serialisationTime = aft - bef;
                     long lastOffset = fos.getChannel().position();
                     dos.close();
                     // RAM storage in bytes
                     long sizeRAM = 0;
-                    icss = new ArrayList<ImmutableConciseSet>();
                     RandomAccessFile memoryMappedFile = new RandomAccessFile(
                             file, "r");
                     MappedByteBuffer mbb = memoryMappedFile.getChannel().map(
                             FileChannel.MapMode.READ_ONLY, 0, lastOffset);
-                    bef = System.currentTimeMillis();
-                    for (int k = 0; k < offsets.size() - 1; k++) {
+                    icss = new ArrayList<ImmutableConciseSet>();
+                    for (int k = 0; k < offsets.size() - 1 ; k++) {
                         mbb.position((int) offsets.get(k).longValue());
                         final ByteBuffer bb = mbb.slice();
                         bb.limit((int) (offsets.get(k + 1) - offsets.get(k)));
                         ImmutableConciseSet ics = new ImmutableConciseSet(bb);
                         icss.add(ics);
-                        if (sizeOf)
-                            sizeRAM += (SizeOf.deepSizeOf(ics));
+                    }
+                    bef = System.currentTimeMillis();
+                    icss = new ArrayList<ImmutableConciseSet>(NumberOfBitmaps);
+                    for (int k = 0; k < offsets.size() - 1 ; k++) {
+                        mbb.position((int) offsets.get(k).longValue());
+                        final ByteBuffer bb = mbb.slice();
+                        bb.limit((int) (offsets.get(k + 1) - offsets.get(k)));
+                        ImmutableConciseSet ics = new ImmutableConciseSet(bb);
+                        icss.add(ics);
                     }
                     aft = System.currentTimeMillis();
                     long deserializationTime = aft - bef;
