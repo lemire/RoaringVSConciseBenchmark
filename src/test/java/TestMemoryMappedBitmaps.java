@@ -191,14 +191,14 @@ public class TestMemoryMappedBitmaps {
                         dos.writeInt(ints[k]);
                     dos.flush();
                 }
+
+                long lastOffset = fos.getChannel().position();
+                concisememoryMappedFile = new RandomAccessFile(concisefile, "r");
+                concisembb = concisememoryMappedFile.getChannel().map(
+                        FileChannel.MapMode.READ_ONLY, 0, lastOffset);
             } finally {
                 dos.close();
             }
-            long lastOffset = fos.getChannel().position();
-            concisememoryMappedFile = new RandomAccessFile(concisefile, "r");
-            concisembb = concisememoryMappedFile.getChannel().map(
-                    FileChannel.MapMode.READ_ONLY, 0, lastOffset);
-
         }
         aft = System.currentTimeMillis();
         System.out.println("It took " + (aft - bef) + " ms");

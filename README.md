@@ -7,6 +7,6 @@ Usage
 ===================
 * install java
 * install maven 2
-* execute : mvn package
+* execute : mvn package   (alternatively: mvn -Dmaven.test.skip=true package)
 * then : cd target
 * then : java -cp MemoryMappedFiles-0.0.1-SNAPSHOT.jar:lib/* -javaagent:./lib/SizeOf.jar Benchmark ../real-roaring-datasets
