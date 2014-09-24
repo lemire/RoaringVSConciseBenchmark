@@ -178,20 +178,23 @@ public class TestMemoryMappedBitmaps {
             concisefile.deleteOnExit();
             final FileOutputStream fos = new FileOutputStream(concisefile);
             final DataOutputStream dos = new DataOutputStream(fos);
-            conciseoffsets = new ArrayList<Long>();
-            // Building 200 ConciseSets
-            for (int j = 0; j < 200; j++) {
-                ConciseSet cs = toConcise(datum[j]);
-                if (!Arrays.equals(toArray(cs), datum[j]))
-                    throw new RuntimeException("bug");
-                conciseoffsets.add(fos.getChannel().position());
-                int[] ints = cs.getWords();
-                for (int k = 0; k < ints.length; k++)
-                    dos.writeInt(ints[k]);
-                dos.flush();
+            try {
+                conciseoffsets = new ArrayList<Long>();
+                // Building 200 ConciseSets
+                for (int j = 0; j < 200; j++) {
+                    ConciseSet cs = toConcise(datum[j]);
+                    if (!Arrays.equals(toArray(cs), datum[j]))
+                        throw new RuntimeException("bug");
+                    conciseoffsets.add(fos.getChannel().position());
+                    int[] ints = cs.getWords();
+                    for (int k = 0; k < ints.length; k++)
+                        dos.writeInt(ints[k]);
+                    dos.flush();
+                }
+            } finally {
+                dos.close();
             }
             long lastOffset = fos.getChannel().position();
-            dos.close();
             concisememoryMappedFile = new RandomAccessFile(concisefile, "r");
             concisembb = concisememoryMappedFile.getChannel().map(
                     FileChannel.MapMode.READ_ONLY, 0, lastOffset);

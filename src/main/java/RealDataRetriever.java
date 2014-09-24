@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.util.*;
 
@@ -11,33 +10,32 @@ import java.util.*;
  */
 public class RealDataRetriever {
 
-        File directory;
+    File directory;
 
-        public RealDataRetriever(String dirName) {
-                directory = new File(dirName);
-                if (!directory.exists() || !directory.isDirectory())
-                        throw new RuntimeException("" + dirName
-                                + " is not a directory");
+    public RealDataRetriever(String dirName) {
+        directory = new File(dirName);
+        if (!directory.exists() || !directory.isDirectory())
+            throw new RuntimeException("" + dirName + " is not a directory");
+    }
+
+    public int[] fetchBitPositions(String dataset, int num) {
+        File whichFile = new File(directory, dataset + num + ".txt");
+        ArrayList<Integer> l = new ArrayList<Integer>();
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(whichFile));
+            String oneLine = buf.readLine(); // a single, perhaps
+                                             // very long, line
+            buf.close();
+            for (String entry : oneLine.split(","))
+                l.add(Integer.parseInt(entry));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        public int[] fetchBitPositions(String dataset, int num) {
-                File whichFile = new File(directory, dataset + num + ".txt");
-                ArrayList<Integer> l = new ArrayList<Integer>();
-                try {
-                        BufferedReader buf = new BufferedReader(new FileReader(
-                                whichFile));
-                        String oneLine = buf.readLine(); // a single, perhaps
-                                                         // very long, line
-                        for (String entry : oneLine.split(","))
-                                l.add(Integer.parseInt(entry));
-                } catch (IOException e) {
-                        throw new RuntimeException(e);
-                }
-
-                int[] ans = new int[l.size()];
-                int ctr = 0;
-                for (int val : l)
-                        ans[ctr++] = val;
-                return ans;
-        }
+        int[] ans = new int[l.size()];
+        int ctr = 0;
+        for (int val : l)
+            ans[ctr++] = val;
+        return ans;
+    }
 }
