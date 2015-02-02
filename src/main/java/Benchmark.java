@@ -18,7 +18,6 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import net.sourceforge.sizeof.SizeOf;
 
@@ -363,7 +362,4 @@ public class Benchmark {
         return scanTime * 1. / nbRepetitions;
     }
 
-    abstract static class Launcher {
-        public abstract void launch();
-    }
 }
