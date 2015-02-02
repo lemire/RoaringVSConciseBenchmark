@@ -35,7 +35,6 @@ public class GenericBenchmark {
         if(datapoints[k] != high +1 ) ++run;
         high = datapoints[k];
       }
-      System.out.println(datapoints.length+" "+run);
       return run;
 }
 
