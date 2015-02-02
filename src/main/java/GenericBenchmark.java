@@ -28,6 +28,17 @@ public class GenericBenchmark {
     private static ImmutableRoaringBitmap irb = null;
     private static ImmutableConciseSet ics = null;
 
+    public static int numberOfRuns(int[] datapoints) {
+      int high = -1000;
+      int run = 0;
+      for(int k = 0; k<datapoints.length; ++k) {
+        if(datapoints[k] != high +1 ) ++run;
+        high = datapoints[k];
+      }
+      System.out.println(datapoints.length+" "+run);
+      return run;
+}
+
     public static void main(String[] args) {
         boolean sizeOf = true;
         try {
@@ -44,6 +55,7 @@ public class GenericBenchmark {
         	ArrayList<int[]> datum = new ArrayList<int[]>();
         	File folder  = new File(args.length == 0 ? "real-roaring-datasets" : args[0]);
           File[] listOfFiles = folder.listFiles();
+          long numberofruns = 0;
           RealDataRetriever dataRetriever = new RealDataRetriever(folder);
 
                 // ************ Roaring part ****************
@@ -59,6 +71,7 @@ public class GenericBenchmark {
                     	 try{
                         int[] data = dataRetriever
                                 .fetchBitPositions(datafile);
+                        numberofruns += numberOfRuns(data);
                         datum.add(data.clone());
                         RoaringBitmap rb = RoaringBitmap.bitmapOf(data);
                         rb.trim();
@@ -136,6 +149,8 @@ public class GenericBenchmark {
                             + " Kb" + " ("
                             + Math.round(sizeDisk * 1. / datum.size())
                             + " bytes/bitmap)");
+                    System.out.println("Number of Runs = "+numberofruns);
+                    System.out.println("Number of Bitmaps = "+datum.size());
                     System.out.println("Horizontal unions time = "
                             + horizUnionTime + " ms");
                     System.out.println("Intersections time = " + intersectTime
@@ -233,6 +248,8 @@ public class GenericBenchmark {
                             + " Kb" + " ("
                             + Math.round(sizeDisk * 1. / datum.size())
                             + " bytes/bitmap)");
+                    System.out.println("Number of Runs = "+numberofruns);
+                    System.out.println("Number of Bitmaps = "+datum.size());
                     System.out.println("Unions time = " + unionTime + " ms");
                     System.out.println("Intersections time = " + intersectTime
                             + " ms");
